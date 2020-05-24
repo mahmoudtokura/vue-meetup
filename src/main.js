@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 
 import AppDropdown from './components/shared/AppDropdown'
 import AppHero from './components/shared/AppHero'
+import Spinner from './components/shared/Spinner'
 
 import moment from 'moment'
 
@@ -12,6 +14,7 @@ Vue.config.productionTip = false
 Vue.component('AppHero', AppHero)
 Vue.component('AppDropdown', AppDropdown)
 Vue.component('AppDropdown', AppDropdown)
+Vue.component('Spinner', Spinner)
 
 // filters functions
 
@@ -29,5 +32,6 @@ Vue.filter("prettyDate", function (value, formatType = 'LL') {
 
 new Vue({
   router,
+  store,
   render: h => h(App),
 }).$mount('#app')

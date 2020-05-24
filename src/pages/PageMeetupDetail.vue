@@ -148,38 +148,34 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'people-meetup-detail',
   data() {
     return {
       meetupId: '',
-      meetupDetail: {},
-      threads: {},
       isLoading: false,
+    }
+  },
+  computed: {
+    ...mapGetters({
+      meetupDetail: ['meetups/getMeetup'],
+      threads: ['threads/getMeetupThread']
+    }),
+    meetupCreator() {
+      return this.meetupDetail.meetupCreator || {}
     }
   },
   created() {
     this.meetupId = this.$route.params.id
     this.isLoading = true
-    axios.get(`/api/v1/meetups/${this.meetupId}`)
-    .then(response => {
-      this.meetupDetail = response.data
-    }).catch(error => {
-      console.log(error);
-    })
-    axios.get(`/api/v1/threads?meetupId=${this.meetupId}`)
-    .then(response => {
-      this.threads = response.data
-    }).catch(error => {
-      console.log(error);
-    })
+    this.fetchMeetupById({meetupId: this.meetupId})
+    this.fetchMeetupThread({meetupId: this.meetupId})
     this.isLoading = false
   },
-  computed: {
-    meetupCreator() {
-      return this.meetupDetail.meetupCreator || ''
-    }
+  methods: {
+    ...mapActions('meetups',['fetchMeetupById']),
+    ...mapActions('threads',['fetchMeetupThread']),
   }
 }
 </script>

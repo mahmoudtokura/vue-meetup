@@ -1,7 +1,8 @@
 <template>
   <div>
     <AppHero />
-    <div class="container">
+    <Spinner v-if="pageLoader_isLoading"/>
+    <div class="container" v-else>
       <section class="section">
       <div class="m-b-lg">
         <h1 class="title is-inline">Featured Meetups in "Location"</h1>
@@ -21,31 +22,38 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { mapGetters, mapActions } from 'vuex'
 
 import Categories from '@/components/CategoryComponent/Categories'
 import Meetups from '@/components/MeetupComponent/Meetups'
+import pageLoader from '../mixins/pageLoader'
+
   export default {
     components: {
       Meetups,
       Categories,
     },
-    data() {
-      return { 
-        meetups: [],
-        categories: [],
-      }
-    },
-    created() {
-      axios.get('/api/v1/categories')
-      .then(response => {
-        this.categories = response.data;
+    mixins: [pageLoader],
+    computed: {
+      ...mapGetters({
+        meetups: ['meetups/getMeetups'],
+        categories: ['categories/getCategories']
       }),
-
-      axios.get('/api/v1/meetups')
-      .then(response => {
-        this.meetups = response.data
+    },
+    created () {
+      this.pageLoader_enableLoader()
+      Promise.all([this.fetchMeetups(), this.fetchCategories()])
+      .then(() => {
+        this.pageLoader_disableLoader()
       })
+      .catch((error)=> {
+        console.log(error)
+        this.pageLoader_disableLoader()
+      })
+    },
+    methods: {
+      ...mapActions('meetups', ['fetchMeetups']),
+      ...mapActions('categories', ['fetchCategories']),
     }
   }
 </script>
